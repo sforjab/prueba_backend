@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -41,11 +42,27 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarios);
     }
 
+    @GetMapping("/getUsuarioPorId/{id}")
+    public ResponseEntity<Usuario> getUsuarioPorId(@PathVariable Long id) {
+        Optional<Usuario> usuario = usuarioService.getUsuarioPorId(id);
+
+        return usuario.map(ResponseEntity::ok)
+                      .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/getUsuarioPorNumIdent/{numIdent}")
     public ResponseEntity<Usuario> getUsuarioPorNumIdent(@PathVariable String numIdent) {
         Optional<Usuario> usuario = usuarioService.getUsuarioPorNumIdent(numIdent);
         
         return usuario.map(ResponseEntity::ok)
                       .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
+        Optional<Usuario> updatedUsuario = usuarioService.updateUsuario(id, usuario);
+
+        return updatedUsuario.map(ResponseEntity::ok)
+                             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
