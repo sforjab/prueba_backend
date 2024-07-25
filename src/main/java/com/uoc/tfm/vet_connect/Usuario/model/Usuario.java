@@ -1,9 +1,15 @@
 package com.uoc.tfm.vet_connect.Usuario.model;
 
+import java.util.List;
+
+import com.uoc.tfm.vet_connect.Mascota.model.Mascota;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,4 +37,7 @@ public class Usuario {
     private String telefono;
     private String email;
     Rol rol;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Mascota> mascotas;
 }

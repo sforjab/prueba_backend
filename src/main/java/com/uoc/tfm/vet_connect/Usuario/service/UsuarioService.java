@@ -7,7 +7,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.uoc.tfm.vet_connect.Usuario.model.Usuario;
 import com.uoc.tfm.vet_connect.Usuario.repository.UsuarioRepository;
@@ -17,6 +16,18 @@ public class UsuarioService {
     @Autowired
     UsuarioRepository usuarioRepository;
 
+    /* public List<Usuario> getAllUsuarios() {
+        return usuarioRepository.findAll();
+    } */
+
+    public Optional<Usuario> getUsuarioPorId(Long id) {
+        return usuarioRepository.findById(id);
+    }
+
+    public Optional<Usuario> getUsuarioPorNumIdent(String numIdent) {
+        return usuarioRepository.findByNumIdent(numIdent);
+    }
+
     @Transactional
     public Optional<Usuario> createUsuario(Usuario usuario) {
         try {
@@ -25,18 +36,6 @@ public class UsuarioService {
         } catch (Exception e) {
             return Optional.empty();
         }
-    }
-
-    public List<Usuario> getAllUsuarios() {
-        return usuarioRepository.findAll();
-    }
-
-    public Optional<Usuario> getUsuarioPorId(Long id) {
-        return usuarioRepository.findById(id);
-    }
-
-    public Optional<Usuario> getUsuarioPorNumIdent(String numIdent) {
-        return usuarioRepository.findByNumIdent(numIdent);
     }
 
     @Transactional
@@ -53,6 +52,21 @@ public class UsuarioService {
                     .orElse(Optional.empty());
         } catch (Exception e) {
             return Optional.empty();
+        }
+    }
+
+    @Transactional
+    public boolean deleteUsuario(Long id) {
+        try {
+            if(usuarioRepository.existsById(id)) {
+                usuarioRepository.deleteById(id);
+
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
         }
     }
 }
