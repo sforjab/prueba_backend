@@ -2,6 +2,7 @@ package com.uoc.tfm.vet_connect.Usuario.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.uoc.tfm.vet_connect.Mascota.model.Mascota;
 
 import jakarta.persistence.CascadeType;
@@ -39,5 +40,6 @@ public class Usuario {
     Rol rol;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Mascota> mascotas;
 }

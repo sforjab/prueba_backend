@@ -2,6 +2,7 @@ package com.uoc.tfm.vet_connect.Mascota.model;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.uoc.tfm.vet_connect.Usuario.model.Usuario;
 
 import jakarta.persistence.Column;
@@ -40,5 +41,6 @@ public class Mascota {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonBackReference
     private Usuario usuario;
 }
