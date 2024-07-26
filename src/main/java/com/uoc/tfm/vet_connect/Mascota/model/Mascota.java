@@ -1,9 +1,9 @@
-package com.uoc.tfm.vet_connect.Mascota.model;
+package com.uoc.tfm.vet_connect.mascota.model;
 
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.uoc.tfm.vet_connect.Usuario.model.Usuario;
+import com.uoc.tfm.vet_connect.usuario.model.Usuario;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

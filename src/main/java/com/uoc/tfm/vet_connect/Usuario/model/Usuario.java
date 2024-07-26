@@ -1,4 +1,4 @@
-package com.uoc.tfm.vet_connect.Usuario.model;
+package com.uoc.tfm.vet_connect.usuario.model;
 
 import java.util.List;
 
@@ -38,6 +38,12 @@ public class Usuario {
     private String telefono;
     private String email;
     Rol rol;
+
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @Column(nullable = false)
+    private String password;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

@@ -1,9 +1,9 @@
-package com.uoc.tfm.vet_connect.Usuario.controller;
+package com.uoc.tfm.vet_connect.usuario.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uoc.tfm.vet_connect.Usuario.model.Usuario;
-import com.uoc.tfm.vet_connect.Usuario.service.UsuarioService;
+import com.uoc.tfm.vet_connect.usuario.model.Usuario;
+import com.uoc.tfm.vet_connect.usuario.service.UsuarioService;
 
 import java.util.List;
 import java.util.Optional;

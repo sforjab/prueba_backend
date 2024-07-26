@@ -1,4 +1,4 @@
-package com.uoc.tfm.vet_connect.Usuario.service;
+package com.uoc.tfm.vet_connect.usuario.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.uoc.tfm.vet_connect.Usuario.model.Usuario;
-import com.uoc.tfm.vet_connect.Usuario.repository.UsuarioRepository;
+import com.uoc.tfm.vet_connect.usuario.model.Usuario;
+import com.uoc.tfm.vet_connect.usuario.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
@@ -43,9 +43,9 @@ public class UsuarioService {
         try {
             return usuarioRepository.findById(id)
                     .map(existingUsuario -> {
-                        // Copia todas las propiedades del objeto usuario a existingUsuario
+                        // Copiamos todas las propiedades del objeto usuario a existingUsuario
                         BeanUtils.copyProperties(usuario, existingUsuario, "id");
-                        // Aquí "id" se excluye para evitar sobrescribir el ID del objeto existente
+                        // Se excluye 'id' para evitar sobrescribir el ID del objeto existente
 
                         return Optional.of(usuarioRepository.save(existingUsuario));
                     })

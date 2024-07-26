@@ -1,4 +1,4 @@
-package com.uoc.tfm.vet_connect.Mascota.controller;
+package com.uoc.tfm.vet_connect.mascota.controller;
 
 import java.util.Optional;
 
@@ -6,10 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.uoc.tfm.vet_connect.Mascota.model.Mascota;
-import com.uoc.tfm.vet_connect.Mascota.service.MascotaService;
+import com.uoc.tfm.vet_connect.mascota.model.Mascota;
+import com.uoc.tfm.vet_connect.mascota.service.MascotaService;
 
+@RestController
+@RequestMapping("/mascotas")
 public class MascotaController {
 
     @Autowired
