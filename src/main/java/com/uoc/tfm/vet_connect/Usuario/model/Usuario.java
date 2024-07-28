@@ -1,9 +1,13 @@
 package com.uoc.tfm.vet_connect.usuario.model;
 
+import java.util.Collection;
 import java.util.List;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.uoc.tfm.vet_connect.Mascota.model.Mascota;
+import com.uoc.tfm.vet_connect.mascota.model.Mascota;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -19,7 +23,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Usuario {
+public class Usuario implements UserDetails {
     @Id
     @GeneratedValue
     private Long id;
@@ -48,4 +52,10 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Mascota> mascotas;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAuthorities'");
+    }
 }
