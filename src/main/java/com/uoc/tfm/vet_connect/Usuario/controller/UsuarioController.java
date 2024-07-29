@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uoc.tfm.vet_connect.usuario.model.Usuario;
 import com.uoc.tfm.vet_connect.usuario.service.UsuarioService;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
