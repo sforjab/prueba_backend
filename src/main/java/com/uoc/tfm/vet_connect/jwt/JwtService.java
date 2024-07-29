@@ -2,11 +2,14 @@ package com.uoc.tfm.vet_connect.jwt;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -15,6 +18,13 @@ import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
+
+    private final Dotenv dotenv;
+
+    @Autowired
+    public JwtService(Dotenv dotenv) {
+        this.dotenv = dotenv;
+    }
     
     @Value("${jwt.secret}")
     private String secret;

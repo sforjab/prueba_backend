@@ -21,6 +21,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authProvider;
+    
     @Value("${BASE_URL}")
     private String url;
 
