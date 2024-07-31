@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
+/* import org.springframework.beans.factory.annotation.Autowired; */
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +19,14 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    private final Dotenv dotenv;
+    /* private final Dotenv dotenv; */
+
+    /* public JwtService(Dotenv dotenv) {
+        this.dotenv = dotenv;
+    } */
 
     @Autowired
-    public JwtService(Dotenv dotenv) {
-        this.dotenv = dotenv;
-    }
+    Dotenv dotenv;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
