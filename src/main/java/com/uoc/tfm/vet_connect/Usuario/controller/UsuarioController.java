@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/api/usuarios")
 public class UsuarioController {
 
     @Autowired
@@ -45,6 +45,14 @@ public class UsuarioController {
     @GetMapping("/getUsuarioPorNumIdent/{numIdent}")
     public ResponseEntity<Usuario> getUsuarioPorNumIdent(@PathVariable String numIdent) {
         Optional<Usuario> usuario = usuarioService.getUsuarioPorNumIdent(numIdent);
+        
+        return usuario.map(ResponseEntity::ok)
+                      .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/getUsuarioPorUsername/{username}")
+    public ResponseEntity<Usuario> getUsuarioPorUsername(@PathVariable String username) {
+        Optional<Usuario> usuario = usuarioService.getUsuarioPorUsername(username);
         
         return usuario.map(ResponseEntity::ok)
                       .orElseGet(() -> ResponseEntity.notFound().build());

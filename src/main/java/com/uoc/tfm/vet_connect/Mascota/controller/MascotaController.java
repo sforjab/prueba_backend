@@ -13,7 +13,7 @@ import com.uoc.tfm.vet_connect.mascota.model.Mascota;
 import com.uoc.tfm.vet_connect.mascota.service.MascotaService;
 
 @RestController
-@RequestMapping("/mascotas")
+@RequestMapping("/api/mascotas")
 public class MascotaController {
 
     @Autowired

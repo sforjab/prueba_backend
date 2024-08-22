@@ -27,6 +27,10 @@ public class UsuarioService {
         return usuarioRepository.findByNumIdent(numIdent);
     }
 
+    public Optional<Usuario> getUsuarioPorUsername(String username) {
+        return usuarioRepository.findByUsername(username);
+    }
+
     @Transactional
     public Optional<Usuario> createUsuario(Usuario usuario) {
         try {
