@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +15,10 @@ import com.uoc.tfm.vet_connect.usuario.repository.UsuarioRepository;
 public class UsuarioService {
     @Autowired
     UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     /* public List<Usuario> getAllUsuarios() {
         return usuarioRepository.findAll();
@@ -34,6 +39,9 @@ public class UsuarioService {
     @Transactional
     public Optional<Usuario> createUsuario(Usuario usuario) {
         try {
+            String encodedPassword = passwordEncoder.encode(usuario.getPassword());
+            usuario.setPassword(encodedPassword);
+
             Usuario savedUsuario = usuarioRepository.save(usuario);
             return Optional.of(savedUsuario);
         } catch (Exception e) {
