@@ -4,8 +4,8 @@ import com.uoc.tfm.vet_connect.auth.model.AuthResponseDTO;
 import com.uoc.tfm.vet_connect.auth.model.LoginRequestDTO;
 import com.uoc.tfm.vet_connect.auth.model.RegistroRequestDTO;
 import com.uoc.tfm.vet_connect.jwt.JwtService;
-import com.uoc.tfm.vet_connect.usuario.model.Usuario;
-import com.uoc.tfm.vet_connect.usuario.model.Rol;
+import com.uoc.tfm.vet_connect.usuario.model.UsuarioDTO;
+import com.uoc.tfm.vet_connect.usuario.model.RolDTO;
 import com.uoc.tfm.vet_connect.usuario.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +30,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO loginRequest) {
-        Optional<Usuario> usuario = usuarioService.getUsuarioPorUsername(loginRequest.getUsername());
+        Optional<UsuarioDTO> usuario = usuarioService.getUsuarioPorUsername(loginRequest.getUsername());
 
         if (usuario.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), usuario.get().getPassword())) {
             String token = jwtService.generateToken(usuario.get());
@@ -41,14 +41,14 @@ public class AuthController {
     }
 
     @PostMapping("/registro")
-    public ResponseEntity<Usuario> registrarUsuario(@RequestBody RegistroRequestDTO registroRequest) {
-        Usuario nuevoUsuario = new Usuario();
+    public ResponseEntity<UsuarioDTO> registrarUsuario(@RequestBody RegistroRequestDTO registroRequest) {
+        UsuarioDTO nuevoUsuario = new UsuarioDTO();
         nuevoUsuario.setUsername(registroRequest.getUsername());
         nuevoUsuario.setPassword(passwordEncoder.encode(registroRequest.getPassword()));
         nuevoUsuario.setEmail(registroRequest.getEmail());
-        nuevoUsuario.setRol(Rol.CLIENTE);  // Define el rol por defecto, por ejemplo CLIENTE
+        nuevoUsuario.setRol(RolDTO.CLIENTE);  // Define el rol por defecto, por ejemplo CLIENTE
 
-        Optional<Usuario> usuarioCreado = usuarioService.createUsuario(nuevoUsuario);
+        Optional<UsuarioDTO> usuarioCreado = usuarioService.createUsuario(nuevoUsuario);
 
         return usuarioCreado.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());

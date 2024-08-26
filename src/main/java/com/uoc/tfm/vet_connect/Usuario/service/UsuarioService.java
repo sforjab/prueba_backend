@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.uoc.tfm.vet_connect.usuario.model.Usuario;
+import com.uoc.tfm.vet_connect.usuario.model.UsuarioDTO;
 import com.uoc.tfm.vet_connect.usuario.repository.UsuarioRepository;
 
 @Service
@@ -24,25 +24,25 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     } */
 
-    public Optional<Usuario> getUsuarioPorId(Long id) {
+    public Optional<UsuarioDTO> getUsuarioPorId(Long id) {
         return usuarioRepository.findById(id);
     }
 
-    public Optional<Usuario> getUsuarioPorNumIdent(String numIdent) {
+    public Optional<UsuarioDTO> getUsuarioPorNumIdent(String numIdent) {
         return usuarioRepository.findByNumIdent(numIdent);
     }
 
-    public Optional<Usuario> getUsuarioPorUsername(String username) {
+    public Optional<UsuarioDTO> getUsuarioPorUsername(String username) {
         return usuarioRepository.findByUsername(username);
     }
 
     @Transactional
-    public Optional<Usuario> createUsuario(Usuario usuario) {
+    public Optional<UsuarioDTO> createUsuario(UsuarioDTO usuario) {
         try {
             String encodedPassword = passwordEncoder.encode(usuario.getPassword());
             usuario.setPassword(encodedPassword);
 
-            Usuario savedUsuario = usuarioRepository.save(usuario);
+            UsuarioDTO savedUsuario = usuarioRepository.save(usuario);
             return Optional.of(savedUsuario);
         } catch (Exception e) {
             return Optional.empty();
@@ -50,7 +50,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Optional<Usuario> updateUsuario(Long id, Usuario usuario) {
+    public Optional<UsuarioDTO> updateUsuario(Long id, UsuarioDTO usuario) {
         try {
             return usuarioRepository.findById(id)
                     .map(existingUsuario -> {

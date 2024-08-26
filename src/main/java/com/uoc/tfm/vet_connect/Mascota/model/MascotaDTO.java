@@ -3,7 +3,7 @@ package com.uoc.tfm.vet_connect.mascota.model;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.uoc.tfm.vet_connect.usuario.model.Usuario;
+import com.uoc.tfm.vet_connect.usuario.model.UsuarioDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Mascota {
+public class MascotaDTO {
     @Id
     @GeneratedValue
     private Long id;
@@ -42,5 +42,5 @@ public class Mascota {
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     @JsonBackReference
-    private Usuario usuario;
+    private UsuarioDTO usuario;
 }
