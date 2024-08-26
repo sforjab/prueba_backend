@@ -57,7 +57,7 @@ public class JwtService {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact(); */
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority()); // Incluye el rol en el token
+        claims.put("rol", userDetails.getAuthorities().iterator().next().getAuthority()); // Incluye el rol en el token
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())

@@ -1,11 +1,11 @@
 package com.uoc.tfm.vet_connect.auth.controller;
 
-import com.uoc.tfm.vet_connect.auth.model.AuthResponseDTO;
-import com.uoc.tfm.vet_connect.auth.model.LoginRequestDTO;
-import com.uoc.tfm.vet_connect.auth.model.RegistroRequestDTO;
+import com.uoc.tfm.vet_connect.auth.model.AuthResponse;
+import com.uoc.tfm.vet_connect.auth.model.LoginRequest;
+import com.uoc.tfm.vet_connect.auth.model.RegistroRequest;
 import com.uoc.tfm.vet_connect.jwt.JwtService;
-import com.uoc.tfm.vet_connect.usuario.model.UsuarioDTO;
-import com.uoc.tfm.vet_connect.usuario.model.RolDTO;
+import com.uoc.tfm.vet_connect.usuario.model.Usuario;
+import com.uoc.tfm.vet_connect.usuario.model.Rol;
 import com.uoc.tfm.vet_connect.usuario.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,26 +29,33 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO loginRequest) {
-        Optional<UsuarioDTO> usuario = usuarioService.getUsuarioPorUsername(loginRequest.getUsername());
+public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
+    Optional<Usuario> usuario = usuarioService.getUsuarioPorUsername(loginRequest.getUsername());
 
-        if (usuario.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), usuario.get().getPassword())) {
-            String token = jwtService.generateToken(usuario.get());
-            return ResponseEntity.ok(new AuthResponseDTO(token, usuario.get().getRol().toString()));
-        }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    if (usuario.isEmpty()) {
+        System.out.println("Usuario no encontrado: " + loginRequest.getUsername());
     }
 
+    if (usuario.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), usuario.get().getPassword())) {
+        System.out.println("Usuario autenticado: " + loginRequest.getUsername());
+        String token = jwtService.generateToken(usuario.get());
+        return ResponseEntity.ok(new AuthResponse(token, usuario.get().getRol().toString()));
+    }
+
+    System.out.println("Fallo en la autenticación para usuario: " + loginRequest.getUsername());
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+}
+
+
     @PostMapping("/registro")
-    public ResponseEntity<UsuarioDTO> registrarUsuario(@RequestBody RegistroRequestDTO registroRequest) {
-        UsuarioDTO nuevoUsuario = new UsuarioDTO();
+    public ResponseEntity<Usuario> registrarUsuario(@RequestBody RegistroRequest registroRequest) {
+        Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setUsername(registroRequest.getUsername());
         nuevoUsuario.setPassword(passwordEncoder.encode(registroRequest.getPassword()));
         nuevoUsuario.setEmail(registroRequest.getEmail());
-        nuevoUsuario.setRol(RolDTO.CLIENTE);  // Define el rol por defecto, por ejemplo CLIENTE
+        nuevoUsuario.setRol(Rol.CLIENTE);  // Define el rol por defecto, por ejemplo CLIENTE
 
-        Optional<UsuarioDTO> usuarioCreado = usuarioService.createUsuario(nuevoUsuario);
+        Optional<Usuario> usuarioCreado = usuarioService.createUsuario(nuevoUsuario);
 
         return usuarioCreado.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());

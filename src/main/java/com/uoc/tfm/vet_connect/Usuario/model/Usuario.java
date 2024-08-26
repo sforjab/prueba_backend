@@ -8,7 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.uoc.tfm.vet_connect.mascota.model.MascotaDTO;
+import com.uoc.tfm.vet_connect.mascota.model.Mascota;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class UsuarioDTO implements UserDetails {
+public class Usuario implements UserDetails {
     @Id
     @GeneratedValue
     private Long id;
@@ -42,7 +42,7 @@ public class UsuarioDTO implements UserDetails {
     private String direccion;
     private String telefono;
     private String email;
-    RolDTO rol;
+    Rol rol;
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -52,7 +52,7 @@ public class UsuarioDTO implements UserDetails {
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<MascotaDTO> mascotas;
+    private List<Mascota> mascotas;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
