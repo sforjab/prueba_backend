@@ -36,8 +36,15 @@ public class MascotaService {
 
     public List<Mascota> getMascotasPorIdUsuario(Long idUsuario) {
         Optional<Usuario> usuario = usuarioService.getUsuarioPorId(idUsuario);
-        return usuario.map(Usuario::getMascotas).orElseGet(List::of);
+        
+        if (!usuario.isPresent()) {
+            // Devuelve una lista vacía si el usuario no existe
+            return List.of();
+        }
+        
+        return usuario.get().getMascotas();
     }
+    
 
     @Transactional
     public Optional<Mascota> createMascota(Mascota mascota) {

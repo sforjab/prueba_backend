@@ -57,9 +57,9 @@ public class MascotaController {
         List<Mascota> mascotas = mascotaService.getMascotasPorIdUsuario(idUsuario);
 
         if (mascotas.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build(); // Devuelve 404 si el usuario no existe o no tiene mascotas
         } else {
-            return ResponseEntity.ok(mascotas);
+            return ResponseEntity.ok(mascotas); // Devuelve 200 con la lista de mascotas
         }
     }
 
