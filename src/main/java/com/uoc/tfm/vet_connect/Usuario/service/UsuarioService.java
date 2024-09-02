@@ -39,28 +39,53 @@ public class UsuarioService {
     @Transactional
     public Optional<Usuario> createUsuario(Usuario usuario) {
         try {
-            String encodedPassword = passwordEncoder.encode(usuario.getPassword());
-            usuario.setPassword(encodedPassword);
+            // Validación de 'numIdent' único
+            if (usuarioRepository.findByNumIdent(usuario.getNumIdent()).isPresent()) {
+                return Optional.empty();
+            }
 
-            Usuario savedUsuario = usuarioRepository.save(usuario);
-            return Optional.of(savedUsuario);
+            // Validación de 'username' único
+            if (usuarioRepository.findByUsername(usuario.getUsername()).isPresent()) {
+                return Optional.empty();
+            }
+
+            // Se encripta la contraseña antes de guardar
+            String passwordCodificado = passwordEncoder.encode(usuario.getPassword());
+            usuario.setPassword(passwordCodificado);
+
+            Usuario usuarioCreado = usuarioRepository.save(usuario);
+            return Optional.of(usuarioCreado);
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
     @Transactional
-    public Optional<Usuario> updateUsuario(Long id, Usuario usuario) {
+    public Optional<Usuario> updateUsuario(Long id, Usuario usuarioModificado) {
         try {
-            return usuarioRepository.findById(id)
-                    .map(existingUsuario -> {
-                        // Copiamos todas las propiedades del objeto usuario a existingUsuario
-                        BeanUtils.copyProperties(usuario, existingUsuario, "id");
-                        // Se excluye 'id' para evitar sobrescribir el ID del objeto existente
+            Optional<Usuario> usuario = usuarioRepository.findById(id);
+            if (!usuario.isPresent()) {
+                return Optional.empty(); // Si el usuario no existe, se devuelve un 'Optional' vacío
+            }
 
-                        return Optional.of(usuarioRepository.save(existingUsuario));
-                    })
-                    .orElse(Optional.empty());
+            // Validación de 'numIdent' único
+            Optional<Usuario> usuarioMismoNumIdent = usuarioRepository.findByNumIdent(usuarioModificado.getNumIdent());
+            if (usuarioMismoNumIdent.isPresent() && !usuarioMismoNumIdent.get().getId().equals(id)) {
+                return Optional.empty(); // Si otro usuario tiene el mismo 'numIdent', devolvemos un 'Optional' vacío
+            }
+
+            // Validación de 'username' único
+            Optional<Usuario> usuarioMismoUsername = usuarioRepository.findByUsername(usuarioModificado.getUsername());
+            if (usuarioMismoUsername.isPresent() && !usuarioMismoUsername.get().getId().equals(id)) {
+                return Optional.empty(); // Si otro usuario tiene el mismo 'username', se devuelve 'Optional' vacío
+            }
+
+            // Copiamos todas las propiedades del objeto 'usuarioModificado' a 'usuario', excluyendo el 'id' y 'password'
+            BeanUtils.copyProperties(usuarioModificado, usuario.get(), "id", "password");
+
+            // Guardamos y devolvemos el usuario actualizado
+            Usuario usuarioAct = usuarioRepository.save(usuario.get());
+            return Optional.of(usuarioAct);
         } catch (Exception e) {
             return Optional.empty();
         }
@@ -71,7 +96,6 @@ public class UsuarioService {
         try {
             if(usuarioRepository.existsById(id)) {
                 usuarioRepository.deleteById(id);
-
                 return true;
             } else {
                 return false;

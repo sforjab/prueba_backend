@@ -39,9 +39,17 @@ public class Usuario implements UserDetails {
     private String apellido1;
     
     private String apellido2;
+
+    @Column(nullable = false)
     private String direccion;
+
+    @Column(nullable = false)
     private String telefono;
+
+    @Column(nullable = false)
     private String email;
+
+    @Column(nullable = false)
     Rol rol;
 
     @Column(nullable = false, unique = true)

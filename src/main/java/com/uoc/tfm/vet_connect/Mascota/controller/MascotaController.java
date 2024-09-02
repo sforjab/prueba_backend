@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uoc.tfm.vet_connect.error.ApiError;
 import com.uoc.tfm.vet_connect.mascota.model.Mascota;
 import com.uoc.tfm.vet_connect.mascota.service.MascotaService;
 
@@ -26,66 +27,85 @@ public class MascotaController {
     MascotaService mascotaService;
 
     @GetMapping("/getMascotaPorId/{id}")
-    public ResponseEntity<Mascota> getMascotaPorId(@PathVariable Long id) {
+    public ResponseEntity<Object> getMascotaPorId(@PathVariable Long id) {
         Optional<Mascota> mascota = mascotaService.getMascotaPorId(id);
 
-        return mascota.map(ResponseEntity::ok)
-                      .orElseGet(() -> ResponseEntity.notFound().build());
+        if (mascota.isPresent()) {
+            return ResponseEntity.ok(mascota.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(new ApiError("Mascota no encontrada con ID: " + id));
+        }
     }
 
     @GetMapping("/getMascotaPorNumChip/{numChip}")
-    public ResponseEntity<Mascota> getMascotaPorNumChip(@PathVariable String numChip) {
+    public ResponseEntity<Object> getMascotaPorNumChip(@PathVariable String numChip) {
         Optional<Mascota> mascota = mascotaService.getMascotaPorNumChip(numChip);
 
-        return mascota.map(ResponseEntity::ok)
-                      .orElseGet(() -> ResponseEntity.notFound().build());
+        if (mascota.isPresent()) {
+            return ResponseEntity.ok(mascota.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(new ApiError("Mascota no encontrada con número de chip: " + numChip));
+        }
     }
 
     @GetMapping("/getMascotaPorNombre/{nombre}")
-    public ResponseEntity<List<Mascota>> getMascotaPorNombre(@PathVariable String nombre) {
+    public ResponseEntity<Object> getMascotaPorNombre(@PathVariable String nombre) {
         List<Mascota> mascotas = mascotaService.getMascotaPorNombre(nombre);
 
         if (mascotas.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(new ApiError("No se encontraron mascotas con el nombre: " + nombre));
         } else {
             return ResponseEntity.ok(mascotas);
         }
     }
 
     @GetMapping("/getMascotasPorIdUsuario/{idUsuario}")
-    public ResponseEntity<List<Mascota>> getMascotasPorIdUsuario(@PathVariable Long idUsuario) {
+    public ResponseEntity<Object> getMascotasPorIdUsuario(@PathVariable Long idUsuario) {
         List<Mascota> mascotas = mascotaService.getMascotasPorIdUsuario(idUsuario);
 
         if (mascotas.isEmpty()) {
-            return ResponseEntity.notFound().build(); // Devuelve 404 si el usuario no existe o no tiene mascotas
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(new ApiError("No se encontraron mascotas para el usuario con ID: " + idUsuario));
         } else {
-            return ResponseEntity.ok(mascotas); // Devuelve 200 con la lista de mascotas
+            return ResponseEntity.ok(mascotas);
         }
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Mascota> createMascota(@RequestBody Mascota mascota) {
+    public ResponseEntity<Object> createMascota(@RequestBody Mascota mascota) {
         Optional<Mascota> createdMascota = mascotaService.createMascota(mascota);
 
-        return createdMascota.map(ResponseEntity::ok)
-                         .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+        if (createdMascota.isPresent()) {
+            return ResponseEntity.ok(createdMascota.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body(new ApiError("Ya existe una mascota con el número de chip: " + mascota.getNumChip()));
+        }
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Mascota> updateMascota(@PathVariable Long id, @RequestBody Mascota mascota) {
+    public ResponseEntity<Object> updateMascota(@PathVariable Long id, @RequestBody Mascota mascota) {
         Optional<Mascota> updatedMascota = mascotaService.updateMascota(id, mascota);
 
-        return updatedMascota.map(ResponseEntity::ok)
-                             .orElseGet(() -> ResponseEntity.notFound().build());
+        if (updatedMascota.isPresent()) {
+            return ResponseEntity.ok(updatedMascota.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(new ApiError("No se pudo actualizar. Mascota no encontrada o número de chip duplicado."));
+        }
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteMascota(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteMascota(@PathVariable Long id) {
         boolean isDeleted = mascotaService.deleteMascota(id);
-        if(isDeleted) {
+        if (isDeleted) {
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(new ApiError("Mascota no encontrada con ID: " + id));
         }
     }
 }

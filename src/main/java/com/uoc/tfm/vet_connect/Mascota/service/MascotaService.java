@@ -37,34 +37,51 @@ public class MascotaService {
     public List<Mascota> getMascotasPorIdUsuario(Long idUsuario) {
         Optional<Usuario> usuario = usuarioService.getUsuarioPorId(idUsuario);
         
+        // Si el usuario no existe, se devuelve lista vacía
         if (!usuario.isPresent()) {
-            // Devuelve una lista vacía si el usuario no existe
             return List.of();
         }
         
         return usuario.get().getMascotas();
     }
     
-
     @Transactional
-    public Optional<Mascota> createMascota(Mascota mascota) {
+    public Optional<Mascota> createMascota(Mascota mascota) {       
         try {
-            Mascota savedMascota = mascotaRepository.save(mascota);
-            return Optional.of(savedMascota);
+            // Si existe otra mascota con el mismo número de chip, se devuelve 'Optional' vacío
+            if (mascotaRepository.findByNumChip(mascota.getNumChip()).isPresent()) {
+                return Optional.empty();
+            }
+
+            Mascota mascotaCreada = mascotaRepository.save(mascota);
+            return Optional.of(mascotaCreada);
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
     @Transactional
-    public Optional<Mascota> updateMascota(Long id, Mascota mascota) {
+    public Optional<Mascota> updateMascota(Long id, Mascota mascotaModificada) {
         try {
-            return mascotaRepository.findById(id)
-                    .map(existingMascota -> {
-                        BeanUtils.copyProperties(mascota, existingMascota, "id");
-                        return Optional.of(mascotaRepository.save(existingMascota));
-                    })
-                    .orElse(Optional.empty());
+            Optional<Mascota> mascota = mascotaRepository.findById(id);
+
+            // Si la mascota no existe, devolvemos 'Optional' vacío
+            if (!mascota.isPresent()) {
+                return Optional.empty();
+            }
+
+            Optional<Mascota> mascotaMismoChip = mascotaRepository.findByNumChip(mascotaModificada.getNumChip());
+            // Si existe otra mascota con el mismo 'numChip', se devuelve 'Optional' vacío
+            if (mascotaMismoChip.isPresent() && !mascotaMismoChip.get().getId().equals(id)) {
+                return Optional.empty();
+            }
+
+            // Copiamos las propiedades de 'mascotaModificada' a 'mascota' existente, excluyendo el 'id'
+            BeanUtils.copyProperties(mascotaModificada, mascota.get(), "id");
+            
+            // Guardamos y devolvemos la mascota actualizada
+            Mascota mascotaAct = mascotaRepository.save(mascota.get());
+            return Optional.of(mascotaAct);
         } catch (Exception e) {
             return Optional.empty();
         }

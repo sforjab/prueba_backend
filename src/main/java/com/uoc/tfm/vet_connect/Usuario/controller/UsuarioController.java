@@ -2,6 +2,7 @@ package com.uoc.tfm.vet_connect.usuario.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uoc.tfm.vet_connect.error.ApiError;
 import com.uoc.tfm.vet_connect.usuario.model.Usuario;
 import com.uoc.tfm.vet_connect.usuario.service.UsuarioService;
 
@@ -35,52 +36,73 @@ public class UsuarioController {
     } */
 
     @GetMapping("/getUsuarioPorId/{id}")
-    public ResponseEntity<Usuario> getUsuarioPorId(@PathVariable Long id) {
+    public ResponseEntity<Object> getUsuarioPorId(@PathVariable Long id) {
         Optional<Usuario> usuario = usuarioService.getUsuarioPorId(id);
 
-        return usuario.map(ResponseEntity::ok)
-                      .orElseGet(() -> ResponseEntity.notFound().build());
+        if (usuario.isPresent()) {
+            return ResponseEntity.ok(usuario.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                 .body(new ApiError("Usuario no encontrado con ID: " + id));
+        }
     }
 
     @GetMapping("/getUsuarioPorNumIdent/{numIdent}")
-    public ResponseEntity<Usuario> getUsuarioPorNumIdent(@PathVariable String numIdent) {
+    public ResponseEntity<Object> getUsuarioPorNumIdent(@PathVariable String numIdent) {
         Optional<Usuario> usuario = usuarioService.getUsuarioPorNumIdent(numIdent);
         
-        return usuario.map(ResponseEntity::ok)
-                      .orElseGet(() -> ResponseEntity.notFound().build());
+        if (usuario.isPresent()) {
+            return ResponseEntity.ok(usuario.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                 .body(new ApiError("Usuario no encontrado con número de identificación: " + numIdent));
+        }
     }
 
     @GetMapping("/getUsuarioPorUsername/{username}")
-    public ResponseEntity<Usuario> getUsuarioPorUsername(@PathVariable String username) {
+    public ResponseEntity<Object> getUsuarioPorUsername(@PathVariable String username) {
         Optional<Usuario> usuario = usuarioService.getUsuarioPorUsername(username);
         
-        return usuario.map(ResponseEntity::ok)
-                      .orElseGet(() -> ResponseEntity.notFound().build());
+        if (usuario.isPresent()) {
+            return ResponseEntity.ok(usuario.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                 .body(new ApiError("Usuario no encontrado con nombre de usuario: " + username));
+        }
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Usuario> createUsuario(@RequestBody Usuario usuario) {
+    public ResponseEntity<Object> createUsuario(@RequestBody Usuario usuario) {
         Optional<Usuario> createdUsuario = usuarioService.createUsuario(usuario);
 
-        return createdUsuario.map(ResponseEntity::ok)
-                         .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+        if (createdUsuario.isPresent()) {
+            return ResponseEntity.ok(createdUsuario.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                                 .body(new ApiError("Ya existe un usuario con el mismo número de identificación o nombre de usuario."));
+        }
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
+    public ResponseEntity<Object> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
         Optional<Usuario> updatedUsuario = usuarioService.updateUsuario(id, usuario);
 
-        return updatedUsuario.map(ResponseEntity::ok)
-                             .orElseGet(() -> ResponseEntity.notFound().build());
+        if (updatedUsuario.isPresent()) {
+            return ResponseEntity.ok(updatedUsuario.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                                 .body(new ApiError("No se pudo actualizar. Usuario no encontrado, número de identificación o nombre de usuario duplicado."));
+        }
     }
 
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Object> deleteUsuario(@PathVariable Long id) {
         boolean isDeleted = usuarioService.deleteUsuario(id);
-        if(isDeleted) {
+        if (isDeleted) {
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                 .body(new ApiError("Usuario no encontrado con ID: " + id));
         }
     }
 }
