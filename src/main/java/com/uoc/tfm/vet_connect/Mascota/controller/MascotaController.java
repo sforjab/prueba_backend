@@ -76,10 +76,10 @@ public class MascotaController {
 
     @PostMapping("/create")
     public ResponseEntity<Object> createMascota(@RequestBody Mascota mascota) {
-        Optional<Mascota> createdMascota = mascotaService.createMascota(mascota);
+        Optional<Mascota> mascotaCreada = mascotaService.createMascota(mascota);
 
-        if (createdMascota.isPresent()) {
-            return ResponseEntity.ok(createdMascota.get());
+        if (mascotaCreada.isPresent()) {
+            return ResponseEntity.ok(mascotaCreada.get());
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                                 .body(new ApiError("Ya existe una mascota con el número de chip: " + mascota.getNumChip()));
@@ -88,10 +88,10 @@ public class MascotaController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateMascota(@PathVariable Long id, @RequestBody Mascota mascota) {
-        Optional<Mascota> updatedMascota = mascotaService.updateMascota(id, mascota);
+        Optional<Mascota> mascotaModificada = mascotaService.updateMascota(id, mascota);
 
-        if (updatedMascota.isPresent()) {
-            return ResponseEntity.ok(updatedMascota.get());
+        if (mascotaModificada.isPresent()) {
+            return ResponseEntity.ok(mascotaModificada.get());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                                 .body(new ApiError("No se pudo actualizar. Mascota no encontrada o número de chip duplicado."));
@@ -100,8 +100,8 @@ public class MascotaController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteMascota(@PathVariable Long id) {
-        boolean isDeleted = mascotaService.deleteMascota(id);
-        if (isDeleted) {
+        boolean mascotaEliminada = mascotaService.deleteMascota(id);
+        if (mascotaEliminada) {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

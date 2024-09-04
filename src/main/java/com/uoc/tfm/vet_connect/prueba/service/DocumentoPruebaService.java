@@ -22,13 +22,12 @@ public class DocumentoPruebaService {
     public Optional<DocumentoPrueba> create(DocumentoPrueba documento) {
         try {
             if (documentoPruebaRepository.existsByNombreArchivoAndPruebaId(documento.getNombreArchivo(), documento.getPrueba().getId())) {
-                return Optional.empty(); // Documento con el mismo nombre ya existe para esta prueba
+                return Optional.empty(); // Un documento con el mismo nombre ya existe para esta prueba
             }
 
             DocumentoPrueba documentoGuardado = documentoPruebaRepository.save(documento);
             return Optional.of(documentoGuardado);
         } catch (Exception e) {
-            // Manejo de errores
             return Optional.empty();
         }
     }
