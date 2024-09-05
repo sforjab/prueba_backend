@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.uoc.tfm.vet_connect.prueba.model.Prueba;
 import com.uoc.tfm.vet_connect.usuario.model.Usuario;
+import com.uoc.tfm.vet_connect.vacuna.model.Vacuna;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -50,4 +51,7 @@ public class Mascota {
 
     @OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prueba> pruebas;
+
+    @OneToMany(mappedBy = "vacuna", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vacuna> vacunas;
 }

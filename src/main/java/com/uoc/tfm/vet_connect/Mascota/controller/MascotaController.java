@@ -22,7 +22,6 @@ import com.uoc.tfm.vet_connect.mascota.service.MascotaService;
 @RestController
 @RequestMapping("/api/mascotas")
 public class MascotaController {
-
     @Autowired
     MascotaService mascotaService;
 

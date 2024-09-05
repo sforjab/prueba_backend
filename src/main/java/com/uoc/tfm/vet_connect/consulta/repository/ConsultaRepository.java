@@ -12,5 +12,5 @@ import com.uoc.tfm.vet_connect.consulta.model.Consulta;
 public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
 
     List<Consulta> findByFechaConsulta(LocalDateTime fecha);
-    
+    List<Consulta> findByMascotaId(Long mascotaId);
 }
