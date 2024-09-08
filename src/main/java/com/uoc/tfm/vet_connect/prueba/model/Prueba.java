@@ -3,6 +3,7 @@ package com.uoc.tfm.vet_connect.prueba.model;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.uoc.tfm.vet_connect.consulta.model.Consulta;
 import com.uoc.tfm.vet_connect.mascota.model.Mascota;
 
 import jakarta.persistence.CascadeType;
@@ -45,11 +46,17 @@ public class Prueba {
     @JoinColumn(name = "mascota_id", nullable = false)
     private Mascota mascota;
 
+    @ManyToOne
+    @JoinColumn(name = "consulta_id")
+    private Consulta consulta;
+
     /* @ManyToOne
     @JoinColumn(name = "veterinario_id", nullable = false)
     private Usuario veterinario; */
 
     @OneToMany(mappedBy = "prueba", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DocumentoPrueba> documentosPrueba;
+
+
 
 }
