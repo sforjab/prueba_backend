@@ -3,8 +3,11 @@ package com.uoc.tfm.vet_connect.usuario.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uoc.tfm.vet_connect.error.ApiError;
+import com.uoc.tfm.vet_connect.jwt.JwtService;
 import com.uoc.tfm.vet_connect.usuario.model.Usuario;
 import com.uoc.tfm.vet_connect.usuario.service.UsuarioService;
+
+import io.jsonwebtoken.Claims;
 
 import java.util.Optional;
 
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
@@ -27,6 +31,12 @@ public class UsuarioController {
 
     @Autowired
     UsuarioService usuarioService;
+
+    @Autowired
+    private JwtService jwtService;
+    
+    // Cargar el archivo .env
+    /* Dotenv dotenv = Dotenv.configure().load(); */
 
     /* @GetMapping("/getUsuarios")
     public ResponseEntity<List<Usuario>> getUsuarios() {
@@ -68,6 +78,34 @@ public class UsuarioController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                                  .body(new ApiError("Usuario no encontrado con nombre de usuario: " + username));
+        }
+    }
+
+    // Método para obtener el usuario logueado desde el token
+    @GetMapping("/getUsuarioLogueado")
+    public ResponseEntity<Object> getUsuarioLogueado(@RequestHeader("Authorization") String token) {
+        try {
+            // Eliminamos el prefijo "Bearer " del token
+            token = token.replace("Bearer ", "");
+
+            // Decodificamos el token sin validarlo
+            Claims claims = jwtService.extractAllClaims(token);
+
+            // Extraemos el "subject" (el username) del token decodificado
+            String username = claims.getSubject();  // El subject es el username por defecto en el token
+
+            // Luego, buscas al usuario por su username en la base de datos
+            Optional<Usuario> usuario = usuarioService.getUsuarioPorUsername(username);
+
+            if (usuario.isPresent()) {
+                return ResponseEntity.ok(usuario.get());
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ApiError("Usuario no encontrado"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiError("Token inválido o usuario no encontrado"));
         }
     }
 

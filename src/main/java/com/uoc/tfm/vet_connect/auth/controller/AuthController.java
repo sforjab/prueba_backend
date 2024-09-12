@@ -29,23 +29,22 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
-    Optional<Usuario> usuario = usuarioService.getUsuarioPorUsername(loginRequest.getUsername());
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
+        Optional<Usuario> usuario = usuarioService.getUsuarioPorUsername(loginRequest.getUsername());
 
-    if (usuario.isEmpty()) {
-        System.out.println("Usuario no encontrado: " + loginRequest.getUsername());
+        if (usuario.isEmpty()) {
+            System.out.println("Usuario no encontrado: " + loginRequest.getUsername());
+        }
+
+        if (usuario.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), usuario.get().getPassword())) {
+            System.out.println("Usuario autenticado: " + loginRequest.getUsername());
+            String token = jwtService.generateToken(usuario.get());
+            return ResponseEntity.ok(new AuthResponse(token, usuario.get().getRol().toString()));
+        }
+
+        System.out.println("Fallo en la autenticación para usuario: " + loginRequest.getUsername());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-
-    if (usuario.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), usuario.get().getPassword())) {
-        System.out.println("Usuario autenticado: " + loginRequest.getUsername());
-        String token = jwtService.generateToken(usuario.get());
-        return ResponseEntity.ok(new AuthResponse(token, usuario.get().getRol().toString()));
-    }
-
-    System.out.println("Fallo en la autenticación para usuario: " + loginRequest.getUsername());
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-}
-
 
     @PostMapping("/registro")
     public ResponseEntity<Usuario> registrarUsuario(@RequestBody RegistroRequest registroRequest) {
