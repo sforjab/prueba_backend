@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.uoc.tfm.vet_connect.usuario.model.Rol;
 import com.uoc.tfm.vet_connect.usuario.model.Usuario;
 import com.uoc.tfm.vet_connect.usuario.repository.UsuarioRepository;
 
@@ -47,6 +48,11 @@ public class UsuarioService {
             // Validación de 'username' único
             if (usuarioRepository.findByUsername(usuario.getUsername()).isPresent()) {
                 return Optional.empty();
+            }
+
+            // Solo permite asociar una clínica si el rol es VETERINARIO o ADMIN_CLINICA
+            if ((usuario.getRol() == Rol.VETERINARIO || usuario.getRol() == Rol.ADMIN_CLINICA) && usuario.getClinica() == null) {
+                return Optional.empty(); // No se puede crear un veterinario o admin de clínica sin asociar una clínica
             }
 
             // Se encripta la contraseña antes de guardar

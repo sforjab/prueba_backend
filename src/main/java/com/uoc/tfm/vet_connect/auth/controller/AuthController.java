@@ -38,7 +38,7 @@ public class AuthController {
 
         if (usuario.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), usuario.get().getPassword())) {
             System.out.println("Usuario autenticado: " + loginRequest.getUsername());
-            String token = jwtService.generateToken(usuario.get());
+            String token = jwtService.generateToken(usuario.get(), usuario.get().getId());
             return ResponseEntity.ok(new AuthResponse(token, usuario.get().getRol().toString()));
         }
 

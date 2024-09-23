@@ -3,17 +3,17 @@ package com.uoc.tfm.vet_connect.usuario.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uoc.tfm.vet_connect.error.ApiError;
-import com.uoc.tfm.vet_connect.jwt.JwtService;
+import com.uoc.tfm.vet_connect.jwt.CustomUserDetails;
 import com.uoc.tfm.vet_connect.usuario.model.Usuario;
 import com.uoc.tfm.vet_connect.usuario.service.UsuarioService;
-
-import io.jsonwebtoken.Claims;
 
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,9 +31,6 @@ public class UsuarioController {
 
     @Autowired
     UsuarioService usuarioService;
-
-    @Autowired
-    private JwtService jwtService;
     
     // Cargar el archivo .env
     /* Dotenv dotenv = Dotenv.configure().load(); */
@@ -85,17 +82,16 @@ public class UsuarioController {
     @GetMapping("/getUsuarioLogueado")
     public ResponseEntity<Object> getUsuarioLogueado(@RequestHeader("Authorization") String token) {
         try {
-            // Eliminamos el prefijo "Bearer " del token
-            token = token.replace("Bearer ", "");
 
-            // Decodificamos el token sin validarlo
-            Claims claims = jwtService.extractAllClaims(token);
+            // Obtenemos la autenticación actual desde el SecurityContextHolder
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            // Extraemos el "subject" (el username) del token decodificado
-            String username = claims.getSubject();  // El subject es el username por defecto en el token
+            CustomUserDetails customDetails = (CustomUserDetails) authentication.getDetails();
 
-            // Luego, buscas al usuario por su username en la base de datos
-            Optional<Usuario> usuario = usuarioService.getUsuarioPorUsername(username);
+            Long idUsuario = customDetails.getIdUsuario();
+
+            // Se busca el usuario en la base de datos a partir del id
+            Optional<Usuario> usuario = usuarioService.getUsuarioPorId(idUsuario);
 
             if (usuario.isPresent()) {
                 return ResponseEntity.ok(usuario.get());
@@ -104,6 +100,7 @@ public class UsuarioController {
                         .body(new ApiError("Usuario no encontrado"));
             }
         } catch (Exception e) {
+            System.out.println("Error en getUsuarioLogueado: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiError("Token inválido o usuario no encontrado"));
         }

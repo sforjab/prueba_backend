@@ -10,6 +10,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -24,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Prueba {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -36,8 +37,8 @@ public class Prueba {
     @Column(nullable = false)
     private LocalDate fecha;
 
-    @Column
-    private String documentoAdjunto;
+    /* @Column
+    private String documentoAdjunto; */
 
     @Column(length = 500)
     private String resultado;
@@ -50,13 +51,7 @@ public class Prueba {
     @JoinColumn(name = "consulta_id")
     private Consulta consulta;
 
-    /* @ManyToOne
-    @JoinColumn(name = "veterinario_id", nullable = false)
-    private Usuario veterinario; */
-
     @OneToMany(mappedBy = "prueba", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DocumentoPrueba> documentosPrueba;
-
-
 
 }

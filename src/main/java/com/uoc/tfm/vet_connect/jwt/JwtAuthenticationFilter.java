@@ -7,11 +7,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,34 +30,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         final String token = getTokenFromRequest(request);
-        final String username;
-
         if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        username = jwtService.extractUsername(token);
-
+        String username = jwtService.extractUsername(token);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
             if (jwtService.isTokenValid(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
-                        null, userDetails.getAuthorities());
+                // Extraemos las claims del token
+                Claims claims = jwtService.extractAllClaims(token);
+                Long idUsuario = claims.get("idUsuario", Long.class);
+                String rol = claims.get("rol", String.class);
 
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
 
+                // Creamos un objeto para almacenar el idUsuario y el rol
+                CustomUserDetails customDetails = new CustomUserDetails(idUsuario, rol);
+
+                // Guardamos el objeto en los detalles del token
+                authToken.setDetails(customDetails);
+                
+                // Guardamos el ID de usuario y el rol en los detalles
+                /* authToken.setDetails(idUsuario);
+                authToken.setDetails(rol); */
+                /* authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request)); */
+
+                // Guardamos el authentication en el SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-
         filterChain.doFilter(request, response);
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
         if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
         }

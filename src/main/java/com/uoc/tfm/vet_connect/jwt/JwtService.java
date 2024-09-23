@@ -30,8 +30,10 @@ public class JwtService {
     @Autowired
     Dotenv dotenv;
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    private Key getSigningKey() {
+        String secretKey = dotenv.get("JWT_SECRET_KEY");
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -43,49 +45,42 @@ public class JwtService {
         return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody();
     }
 
-    private Key getSigningKey() {
-        String secretKey = dotenv.get("JWT_SECRET_KEY");
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
+    // Extraemos el username
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        /* return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact(); */
+    // Extraemos el rol del token
+    public String extractRol(String token) {
+        return extractClaim(token, claims -> claims.get("rol", String.class));
+    }
+
+    // Extraemos el ID del usuario desde el token
+    public Long extractIdUsuario(String token) {
+        return extractClaim(token, claims -> claims.get("idUsuario", Long.class));
+    }
+
+    // Generar el token con rol e ID de usuario
+    public String generateToken(UserDetails userDetails, Long userId) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("rol", userDetails.getAuthorities().iterator().next().getAuthority()); // Incluye el rol en el token
+        claims.put("rol", userDetails.getAuthorities().iterator().next().getAuthority());
+        claims.put("idUsuario", userId);
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 horas
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
+    // Validamos si el token es válido
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        /* return (username.equals(userDetails.getUsername()) && !isTokenExpired(token)); */
-
-        boolean tokenExpired = isTokenExpired(token);
-        boolean isValid = (username.equals(userDetails.getUsername()) && !tokenExpired);
-
-        System.out.println("Token para el usuario " + username + " es válido: " + isValid + ". Expirado: " + tokenExpired);
-
-        return isValid;
+        final String username = extractClaim(token, Claims::getSubject);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
-        /* return extractClaim(token, Claims::getExpiration).before(new Date()); */
-            Date expirationDate = extractClaim(token, Claims::getExpiration);
-        boolean isExpired = expirationDate.before(new Date());
-
-        System.out.println("Fecha de expiración del token: " + expirationDate + ". Token expirado: " + isExpired);
-
-        return isExpired;
+        return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 }

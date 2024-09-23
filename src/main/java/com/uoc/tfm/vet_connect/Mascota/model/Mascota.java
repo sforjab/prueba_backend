@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.uoc.tfm.vet_connect.consulta.model.Consulta;
 import com.uoc.tfm.vet_connect.prueba.model.Prueba;
 import com.uoc.tfm.vet_connect.usuario.model.Usuario;
 import com.uoc.tfm.vet_connect.vacuna.model.Vacuna;
@@ -12,6 +13,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -26,7 +28,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Mascota {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -54,4 +56,7 @@ public class Mascota {
 
     @OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vacuna> vacunas;
+
+    @OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Consulta> consultas;
 }
