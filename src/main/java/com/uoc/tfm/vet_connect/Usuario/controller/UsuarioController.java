@@ -108,7 +108,9 @@ public class UsuarioController {
 
     @PostMapping("/create")
     public ResponseEntity<Object> createUsuario(@RequestBody Usuario usuario) {
+        System.out.println("ANTES DE LLAMAR AL SERVICE DE CREATE");
         Optional<Usuario> createdUsuario = usuarioService.createUsuario(usuario);
+        System.out.println("DESPUÉS DE LLAMAR AL SERVICE DE CREATE");
 
         if (createdUsuario.isPresent()) {
             return ResponseEntity.ok(createdUsuario.get());

@@ -39,7 +39,13 @@ public class Consulta {
     private String motivo; // Motivo de la consulta
 
     @Column(length = 1000)
-    private String observaciones; // Observaciones realizadas por el veterinario
+    private String observaciones; // Observaciones públicas realizadas por el veterinario
+
+    @Column(length = 500)
+    private String notas; // Anotaciones privadas realizadas por el veterinario
+
+    @Column(length = 500)
+    private String medicacion; // Medicación pautada
 
     // Relación con Mascota
     @ManyToOne

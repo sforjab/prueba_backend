@@ -62,7 +62,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // Configuración de CORS
                 .authorizeHttpRequests(authRequest -> authRequest
-                        .requestMatchers("/api/auth/**", "/api/usuarios/create").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/usuarios/create", "/api/clinicas/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManager -> sessionManager
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

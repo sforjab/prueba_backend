@@ -2,6 +2,7 @@ package com.uoc.tfm.vet_connect.clinica.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.uoc.tfm.vet_connect.usuario.model.Usuario;
 
 import jakarta.persistence.CascadeType;
@@ -14,6 +15,7 @@ import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
@@ -38,5 +40,7 @@ public class Clinica {
 
     // Relación con veterinarios y administradores de clínica
     @OneToMany(mappedBy = "clinica", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @ToString.Exclude
     private List<Usuario> veterinarios;
 }

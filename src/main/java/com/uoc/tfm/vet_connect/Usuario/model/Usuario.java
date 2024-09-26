@@ -7,6 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.uoc.tfm.vet_connect.clinica.model.Clinica;
 import com.uoc.tfm.vet_connect.mascota.model.Mascota;
@@ -23,6 +25,7 @@ import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
@@ -35,6 +38,9 @@ public class Usuario implements UserDetails {
 
     @Column(nullable = false, unique = true)
     private String numIdent;
+
+    @Column(unique = true)
+    private String numColegiado;
 
     @Column(nullable = false)
     private String nombre;
@@ -65,13 +71,17 @@ public class Usuario implements UserDetails {
     // Relación opcional con la entidad Clínica, solo para VETERINARIO o ADMIN_CLINICA
     @ManyToOne
     @JoinColumn(name = "clinica_id", nullable = true)  // La relación es opcional
+    @JsonBackReference
+    @ToString.Exclude
     private Clinica clinica;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
+    @ToString.Exclude
     private List<Mascota> mascotas;
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(rol.name()));
     }
