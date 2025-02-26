@@ -1,5 +1,10 @@
 pipeline {
-    agent any 
+     agent {
+        docker {
+            image 'maven:3.8.6-amazoncorretto-17' // Usa la versión de Maven y JDK que necesites
+            label 'maven-agent' // Etiqueta para el agente (opcional)
+        }
+    }
 
     stages {
         stage('Checkout') {
